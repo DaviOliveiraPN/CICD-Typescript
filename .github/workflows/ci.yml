@@ -8,7 +8,37 @@ on:
 
 jobs:
   # ─────────────────────────────────────────────
-  # 1. Validação do padrão de commits
+  # 1. Validação do nome da branch
+  # ─────────────────────────────────────────────
+  branchlint:
+    name: 🌿 Branch Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch name
+        run: |
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          echo "Branch: $BRANCH"
+
+          # Padrão permitido:
+          # main | develop | US-123 | US-123-short-description
+          if echo "$BRANCH" | grep -qE '^(main|develop)$|^US-[0-9]+(-[a-z0-9._-]+)?$'; then
+            echo "✅ Branch name is valid."
+          else
+            echo "❌ Invalid branch name: '$BRANCH'"
+            echo ""
+            echo "Branch names must follow the pattern:"
+            echo "  main"
+            echo "  develop"
+            echo "  US-123"
+            echo "  US-123-short-description"
+            echo ""
+            echo "Rules: prefix must be 'US-' followed by the issue number,"
+            echo "optionally followed by a lowercase hyphenated description."
+            exit 1
+          fi
+
+  # ─────────────────────────────────────────────
+  # 2. Validação do padrão de commits
   # ─────────────────────────────────────────────
   commitlint:
     name: 📝 Commit Lint
@@ -29,12 +59,12 @@ jobs:
         run: npx commitlint --from ${{ github.event.pull_request.base.sha || 'HEAD~1' }} --to HEAD --verbose
 
   # ─────────────────────────────────────────────
-  # 2. Lint, Build e Testes
+  # 3. Lint, Build e Testes
   # ─────────────────────────────────────────────
   quality:
     name: 🔍 Quality Checks
     runs-on: ubuntu-latest
-    needs: commitlint
+    needs: [branchlint, commitlint]
 
     services:
       mongodb:
@@ -99,7 +129,7 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────────
-  # 3. Build e push da imagem Docker
+  # 4. Build e push da imagem Docker
   # ─────────────────────────────────────────────
   docker:
     name: 🐳 Docker Build & Push

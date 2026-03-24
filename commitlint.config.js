@@ -11,11 +11,10 @@ module.exports = {
         'fix',      // correção de bug
         'docs',     // documentação
         'style',    // formatação (sem mudança de lógica)
+        'chore',    // mudanças no projeto como lint, prettier ou .gitignore  
         'refactor', // refatoração
         'test',     // testes
         'chore',    // tarefas de build, configs
-        'perf',     // melhoria de performance
-        'ci',       // mudanças de CI
         'revert',   // revert de commit
       ],
     ],
