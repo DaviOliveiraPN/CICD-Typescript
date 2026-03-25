@@ -15,7 +15,7 @@ module.exports = {
         'refactor', // refatoração
         'test',     // testes
         'chore',    // tarefas de build, configs
-        'revert',   // revert de commit
+        'revert'    // revert de commit
       ],
     ],
     'type-case': [2, 'always', 'lower-case'],
